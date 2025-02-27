@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <title>BINfluencers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Leaflet CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet/dist/leaflet.css"
@@ -22,7 +21,6 @@
   </head>
   <body>
     <div id="map"></div>
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
       // Initialize the map centered on the US
@@ -73,7 +71,7 @@
           // Bind a popup with the state's text
           layer.bindPopup(stateTexts[stateName]);
 
-          // Open the popup on mouseover and reset on mouseout
+          // Open the popup on mouseover and click
           layer.on({
             mouseover: function (e) {
               this.openPopup();
@@ -86,6 +84,9 @@
             mouseout: function (e) {
               this.closePopup();
               geojson.resetStyle(e.target);
+            },
+            click: function (e) {
+              this.openPopup();
             },
           });
         }
