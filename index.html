@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>US Map with Highlighted States</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet/dist/leaflet.css"
+    />
+    <style>
+      /* Ensure the map fills the container */
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      // Initialize the map centered on the US
+      var map = L.map("map").setView([37.8, -96], 4);
+
+      // Add a base layer from OpenStreetMap
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+      }).addTo(map);
+
+      // Define the popup content for each highlighted state
+      var stateTexts = {
+        "California":
+          "<p>In California, Katelyn is working to increase recycling and proper waste disposal in New Orleans’ Black communities by partnering with beauty supply stores, corner shops, salons, and barbershops to distribute educational materials and set up recycling stations. To amplify her impact, DoSomething connected Katelyn with a local climate activist to produce a video showcasing her work. Additionally, her leadership was recognized in an upcoming Associated Press feature, set to be published on March 10th. Katelyn credits the Binfluencers program with not only empowering her to take action but also making community-driven environmental change feel both achievable and essential.</p><p>Our second California based influencer, Arman, is leading \"Recycle Right,\" a campaign to tackle waste contamination by educating residents on proper recycling habits. Through visual guides, improved bin signage, and interactive community events, they aim to make recycling rules clear and easy to follow. By partnering with local schools, nonprofits, and cultural organizations, they ensure that underrepresented groups have access to multilingual recycling education, making sustainable waste management a community-wide effort.</p>",
+        "Texas":
+          "<p>In Texas, Aria is developing accessible ways for Dallas residents to recycle non-traditional items like metal car parts, electronics, and hangers to prevent them from ending up in landfills. Alternatively, Saanvi is leading a campaign to reduce recycling contamination by advocating for better recycling practices at Domino’s Pizza. Through a letter-writing initiative, Saanvi is mobilizing students and community members to push for sustainable packaging solutions. Additionally, they are working with a POC Youth Board and local cultural organizations to provide multilingual recycling education, ensuring that Dallas’ diverse communities have the knowledge and resources to recycle correctly.</p>",
+        "Louisiana":
+          "<p>In New Orleans, Jordan is working to improve waste management in Black-owned beauty supply stores, salons, and corner shops by introducing recycling services and educational materials. By partnering with local waste disposal companies, they aim to ensure that plastic packaging, chemical products, and other waste are properly handled. Their initiative will also collect data on waste reduction to advocate for increased funding and policy changes that benefit Black neighborhoods.</p>",
+      };
+
+      // Define style function to highlight our three states
+      function style(feature) {
+        var stateName = feature.properties.name;
+        if (
+          stateName === "California" ||
+          stateName === "Texas" ||
+          stateName === "Louisiana"
+        ) {
+          return {
+            weight: 2,
+            color: "#FF0000",
+            fillOpacity: 0.7,
+            fillColor: "#FFEDA0",
+          };
+        }
+        return {
+          weight: 1,
+          color: "#3388ff",
+          fillOpacity: 0.2,
+          fillColor: "#B0C4DE",
+        };
+      }
+
+      // Attach mouse events and popups to highlighted states
+      function onEachFeature(feature, layer) {
+        var stateName = feature.properties.name;
+        if (stateTexts[stateName]) {
+          // Bind a popup with the state's text
+          layer.bindPopup(stateTexts[stateName]);
+
+          // Open the popup on mouseover and reset on mouseout
+          layer.on({
+            mouseover: function (e) {
+              this.openPopup();
+              e.target.setStyle({
+                weight: 3,
+                color: "#666",
+                fillOpacity: 0.9,
+              });
+            },
+            mouseout: function (e) {
+              this.closePopup();
+              geojson.resetStyle(e.target);
+            },
+          });
+        }
+      }
+
+      // Load US states GeoJSON from a public source
+      var geojson;
+      fetch(
+        "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          geojson = L.geoJson(data, {
+            style: style,
+            onEachFeature: onEachFeature,
+          }).addTo(map);
+        });
+    </script>
+  </body>
+</html>
